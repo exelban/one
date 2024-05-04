@@ -1,7 +1,5 @@
 #!/bin/bash
 
-DIR="${DIR:-"$HOME/.local/bin"}"
-
 ARCH=$(uname -m)
 case $ARCH in
     i386|i686) ARCH=x86 ;;
@@ -13,5 +11,5 @@ FILE="one_${LATEST_VERSION//v/}_$(uname -s)_${ARCH}.tar.gz"
 
 curl -L -o one.tar.gz "https://github.com/exelban/one/releases/download/${LATEST_VERSION}/${FILE}"
 tar xzvf one.tar.gz one
-install -dm 755 one -t "$DIR"
-rm one one.tar.gz
+install -m 755 one -t "/usr/local/bin"
+rm one.tar.gz
