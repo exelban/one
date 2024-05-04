@@ -13,5 +13,5 @@ FILE="one_${LATEST_VERSION//v/}_$(uname -s)_${ARCH}.tar.gz"
 
 curl -L -o one.tar.gz "https://github.com/exelban/one/releases/download/${LATEST_VERSION}/${FILE}"
 tar xzvf one.tar.gz one
-install -Dm 755 one -t "$DIR"
+install -dm 755 one -t "$DIR"
 rm one one.tar.gz
