@@ -13,7 +13,7 @@ You can manually download a binary release [here](https://github.com/exelban/one
 
 ### curl
 ```bash
-curl https://github.com/exelban/one/blob/master/install.sh | bash
+curl https://raw.githubusercontent.com/exelban/one/master/install.sh | bash
 ```
 
 ### go

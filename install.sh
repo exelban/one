@@ -6,7 +6,6 @@ ARCH=$(uname -m)
 case $ARCH in
     i386|i686) ARCH=x86 ;;
     aarch64*) ARCH=arm64 ;;
-    *) echo "Unsupported architecture"; exit 1 ;;
 esac
 
 LATEST_VERSION=$(curl -L -s -H 'Accept: application/json' https://github.com/exelban/one/releases/latest | sed -e 's/.*"tag_name":"\([^"]*\)".*/\1/')
