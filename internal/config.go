@@ -7,13 +7,12 @@ import (
 	"strings"
 )
 
-type Docker struct {
-	File          string   `yaml:"file,omitempty"`
-	Image         string   `yaml:"image,omitempty"`
-	Push          bool     `yaml:"push,omitempty"`
-	Platforms     []string `yaml:"platforms,omitempty"`
-	Args          []string `yaml:"args,omitempty"`
-	ForceRecreate bool     `yaml:"force,omitempty"`
+type Build struct {
+	File          string `yaml:"file,omitempty"`
+	Push          bool   `yaml:"push,omitempty"`
+	Platform      string `yaml:"platform,omitempty"`
+	Args          string `yaml:"args,omitempty"`
+	ForceRecreate bool   `yaml:"force,omitempty"`
 }
 
 type SSH struct {
@@ -29,10 +28,11 @@ type SSH struct {
 
 type Config struct {
 	Name    string `yaml:"name"`
+	Image   string `yaml:"image,omitempty"`
 	Context string `yaml:"context,omitempty"`
 
-	Docker *Docker `yaml:"docker,omitempty"`
-	SSH    *SSH    `yaml:"ssh,omitempty"`
+	Build *Build `yaml:"build,omitempty"`
+	SSH   *SSH   `yaml:"ssh,omitempty"`
 }
 
 func LoadConfig() *Config {
@@ -63,28 +63,25 @@ func (c *Config) Save() error {
 
 func (c *Config) Print() string {
 	str := fmt.Sprintf("Name: %s\n", c.Name)
-	if c.Docker != nil {
+	if c.Image != "" {
+		str += fmt.Sprintf("Image: %s\n", c.Image)
+	}
+	if c.Context != "" {
+		str += fmt.Sprintf("Context: %s\n", c.Context)
+	}
+	if c.Build != nil {
 		str += fmt.Sprint("Docker: \n")
-		if c.Docker.File != "" {
-			str += fmt.Sprintf("  File: %s\n", c.Docker.File)
+		if c.Build.File != "" {
+			str += fmt.Sprintf("  File: %s\n", c.Build.File)
 		}
-		if c.Docker.Image != "" {
-			str += fmt.Sprintf("  Image: %s\n", c.Docker.Image)
+		if c.Build.Push {
+			str += fmt.Sprintf("  Push: %t\n", c.Build.Push)
 		}
-		if c.Docker.Push {
-			str += fmt.Sprintf("  Push: %t\n", c.Docker.Push)
+		if c.Build.Platform != "" {
+			str += fmt.Sprintf("  Platforms: %s\n", c.Build.Platform)
 		}
-		if len(c.Docker.Platforms) > 0 {
-			str += fmt.Sprint("  Platforms: \n")
-			for _, platform := range c.Docker.Platforms {
-				str += fmt.Sprintf("    %s\n", platform)
-			}
-		}
-		if len(c.Docker.Args) > 0 {
-			str += fmt.Sprint("  Args:")
-			for _, arg := range c.Docker.Args {
-				str += fmt.Sprintf("\n    %s", arg)
-			}
+		if c.Build.Args != "" {
+			str += fmt.Sprintf("  Args: %s\n", c.Build.Args)
 		}
 	}
 	if c.SSH != nil {

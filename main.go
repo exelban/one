@@ -91,7 +91,7 @@ func main() {
 	}
 }
 
-const version = "unknown"
+var version = "unknown"
 
 func (s *cli) run(args []string) error {
 	if len(args) == 0 {
@@ -111,6 +111,9 @@ func (s *cli) run(args []string) error {
 				fmt.Printf("error find context: %v\n", err)
 			} else if ctx != nil {
 				s.config.SSH = ctx.SSH
+				if ctx.Build != nil && s.config.Build == nil {
+					s.config.Build = ctx.Build
+				}
 			}
 		} else if activeCtx := internal.ActiveContext(); activeCtx != nil {
 			s.config.SSH = activeCtx.SSH
@@ -121,8 +124,8 @@ func (s *cli) run(args []string) error {
 		if s.config.Name == "" && c.Name != "" {
 			s.config.Name = c.Name
 		}
-		if s.config.Docker == nil && c.Docker != nil {
-			s.config.Docker = c.Docker
+		if s.config.Build == nil && c.Build != nil {
+			s.config.Build = c.Build
 		}
 	}
 

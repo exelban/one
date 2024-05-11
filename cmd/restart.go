@@ -5,24 +5,33 @@ import (
 	"github.com/exelban/one/internal"
 	"io"
 	"os"
+	"time"
 )
 
 func RestartCMD(cfg *internal.Config, args []string) error {
-	if cfg.Docker == nil {
-		return fmt.Errorf("docker configuration is not provided")
+	if cfg.Name == "" && cfg.Image == "" {
+		return fmt.Errorf("service name or image is not provided")
+	}
+
+	if cfg.Image != "" {
+		cmdName := "docker"
+		cmdArgs := []string{"pull", cfg.Image}
+		outPipe, errPipe, cancel, wait, err := internal.Execute(cfg, cmdName, cmdArgs)
+		if err != nil {
+			return fmt.Errorf("failed to execute command: %w", err)
+		}
+		defer cancel()
+		go io.Copy(os.Stdout, outPipe)
+		go io.Copy(os.Stderr, errPipe)
+		_ = wait()
 	}
 
 	copyFile := internal.BoolFlag(&args, "--copy", "-c")
+	force := internal.BoolFlag(&args, "--force", "-f")
+
 	if copyFile {
 		if err := internal.CopyDockerCompose(cfg); err != nil {
 			return fmt.Errorf("failed to copy docker-compose file: %w", err)
-		}
-	}
-
-	force := false
-	for _, arg := range args {
-		if arg == "-f" || arg == "--force" {
-			force = true
 		}
 	}
 
@@ -48,34 +57,59 @@ func RestartCMD(cfg *internal.Config, args []string) error {
 		return nil
 	}
 
-	cmdName := "docker"
-	cmdArgs := []string{"pull", cfg.Docker.Image}
-	outPipe, errPipe, cancel, wait, err := internal.Execute(cfg, cmdName, cmdArgs)
+	if force {
+		cmdArgs := []string{"up", "-d", "--force-recreate"}
+		if cfg.Name != "" {
+			cmdArgs = append(cmdArgs, cfg.Name)
+		}
+		outPipe, errPipe, cancel, wait, err := internal.Execute(cfg, "docker-compose", cmdArgs)
+		if err != nil {
+			return fmt.Errorf("failed to execute command: %w", err)
+		}
+		defer cancel()
+		go io.Copy(os.Stdout, outPipe)
+		go io.Copy(os.Stderr, errPipe)
+		_ = wait()
+		return nil
+	}
+
+	if cfg.Name == "" {
+		return fmt.Errorf("service name is not provided, blue-green deployment is not possible")
+	}
+
+	fmt.Println("Starting temporary container...")
+
+	cmdArgs := []string{"--project-name=copy", "up", "-d", "--wait", cfg.Name}
+	_, _, cancel, wait, err := internal.Execute(cfg, "docker-compose", cmdArgs)
 	if err != nil {
 		return fmt.Errorf("failed to execute command: %w", err)
 	}
 	defer cancel()
-	go io.Copy(os.Stdout, outPipe)
-	go io.Copy(os.Stderr, errPipe)
 	_ = wait()
 
-	cmdName = "docker-compose"
-	cmdArgs = []string{"up", "-d"}
-	if force || cfg.Docker.ForceRecreate {
-		cmdArgs = append(cmdArgs, "--force-recreate")
-	}
-	if cfg.Name != "" {
-		cmdArgs = append(cmdArgs, cfg.Name)
-	}
+	time.Sleep(1 * time.Second)
+	fmt.Println("Temporary container started, going to start new container...")
 
-	_, errPipe, cancel, wait, err = internal.Execute(cfg, cmdName, cmdArgs)
+	cmdArgs = []string{"up", "-d", "--force-recreate", "--wait", cfg.Name}
+	_, _, cancel, wait, err = internal.Execute(cfg, "docker-compose", cmdArgs)
 	if err != nil {
 		return fmt.Errorf("failed to execute command: %w", err)
 	}
 	defer cancel()
-	go io.Copy(os.Stdout, outPipe)
-	go io.Copy(os.Stderr, errPipe)
 	_ = wait()
+
+	time.Sleep(1 * time.Second)
+	fmt.Println("New container started, going to stop temporary container...")
+
+	cmdArgs = []string{"--project-name=copy", "stop", cfg.Name}
+	_, _, cancel, wait, err = internal.Execute(cfg, "docker-compose", cmdArgs)
+	if err != nil {
+		return fmt.Errorf("failed to execute command: %w", err)
+	}
+	defer cancel()
+	_ = wait()
+
+	fmt.Println("Graceful restart completed")
 
 	return nil
 }

@@ -10,9 +10,11 @@ import (
 )
 
 func BuildCMD(cfg *internal.Config, args []string) error {
+	push := internal.BoolFlag(&args, "--push", "-p")
+
 	var image string
-	if cfg.Docker != nil && cfg.Docker.Image != "" {
-		image = cfg.Docker.Image
+	if cfg.Image != "" {
+		image = cfg.Image
 	}
 	if len(args) > 0 {
 		image = args[0]
@@ -23,22 +25,32 @@ func BuildCMD(cfg *internal.Config, args []string) error {
 	}
 
 	if strings.Contains(image, ":") {
-		if cfg.Docker == nil {
-			cfg.Docker = &internal.Docker{}
+		if cfg.Build == nil {
+			cfg.Build = &internal.Build{}
 		}
-		cfg.Docker.Image = image
+		cfg.Image = image
 	} else {
-		if cfg.Docker == nil || cfg.Docker.Image == "" {
+		if cfg.Image == "" {
 			return errors.New("[ERROR]: provided tag without image name")
 		}
-		cfg.Docker.Image = fmt.Sprintf("%s:%s", strings.Split(cfg.Docker.Image, ":")[0], image)
+		cfg.Image = fmt.Sprintf("%s:%s", strings.Split(cfg.Image, ":")[0], image)
 	}
 
-	if cfg.Docker == nil || cfg.Docker.Image == "" {
+	c := cfg.Build
+	if c == nil {
+		c = &internal.Build{}
+	}
+
+	if cfg.Image == "" {
 		return errors.New("cannot build without image name")
 	}
+	if !cfg.Build.Push && push {
+		cfg.Build.Push = push
+	}
 
-	command := exec.Command("docker", buildDockerBuild(cfg.Docker)...)
+	fmt.Printf("Building image %s\n", cfg.Image)
+
+	command := exec.Command("docker", buildDockerBuild(cfg.Image, c)...)
 	command.Stderr = os.Stderr
 	command.Stdout = os.Stdout
 	if err := command.Run(); err != nil {
@@ -48,9 +60,11 @@ func BuildCMD(cfg *internal.Config, args []string) error {
 	return nil
 }
 
-func buildDockerBuild(c *internal.Docker) (arr []string) {
-	if len(c.Platforms) > 0 {
+func buildDockerBuild(image string, c *internal.Build) (arr []string) {
+	if c.Platform != "" {
 		arr = append(arr, "buildx")
+		arr = append(arr, "build")
+		arr = append(arr, fmt.Sprintf("--platform=%s", c.Platform))
 	} else {
 		arr = append(arr, "build")
 	}
@@ -58,28 +72,31 @@ func buildDockerBuild(c *internal.Docker) (arr []string) {
 	if c.Push {
 		arr = append(arr, "--push")
 	}
-	if len(c.Platforms) > 0 {
-		str := "--platform="
-		for i, platform := range c.Platforms {
-			if i > 0 {
-				str += ","
+
+	if c.Args != "" {
+		for _, arg := range strings.Split(c.Args, ",") {
+			arg = strings.TrimSpace(arg)
+			keyValue := strings.Split(arg, "=")
+			if len(keyValue) == 2 && strings.Contains(keyValue[1], "env") {
+				env := strings.TrimPrefix(keyValue[1], "env:")
+				env = strings.TrimSpace(env)
+				if value := os.Getenv(env); value != "" {
+					keyValue[1] = value
+				}
 			}
-			str += platform
-		}
-		arr = append(arr, str)
-	}
-	if len(c.Args) > 0 {
-		for _, arg := range c.Args {
-			arr = append(arr, fmt.Sprintf("--build-arg=%s", arg))
+			arr = append(arr, fmt.Sprintf("--build-arg=%s", strings.Join(keyValue, "=")))
 		}
 	}
-	if c.Image != "" {
-		arr = append(arr, fmt.Sprintf("--tag=%s", c.Image))
-	}
+
 	if c.File != "" {
 		arr = append(arr, c.File)
 	} else {
 		arr = append(arr, ".")
 	}
+
+	if image != "" {
+		arr = append(arr, fmt.Sprintf("--tag=%s", image))
+	}
+
 	return
 }

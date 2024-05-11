@@ -11,6 +11,11 @@ The main purpose of the project is to simplify the management of microservices l
 ### Binary release
 You can manually download a binary release [here](https://github.com/exelban/one/releases).
 
+### curl
+```bash
+curl -sfL https://api.serhiy.io/one/install.sh | sh
+```
+
 ### go
 ```bash
 go install github.com/exelban/one@latest

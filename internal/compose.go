@@ -54,10 +54,8 @@ func DockerCompose(cfg *Config) *Config {
 	}
 
 	return &Config{
-		Name: s.ContainerName,
-		Docker: &Docker{
-			Image: s.Image,
-		},
+		Name:  s.ContainerName,
+		Image: s.Image,
 	}
 }
 

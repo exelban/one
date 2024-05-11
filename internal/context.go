@@ -12,6 +12,7 @@ type Context struct {
 	Name   string `yaml:"name"`
 	Active bool   `yaml:"active,omitempty"`
 	SSH    *SSH   `yaml:"ssh,omitempty"`
+	Build  *Build `yaml:"build,omitempty"`
 }
 
 func (c *Context) Save() error {

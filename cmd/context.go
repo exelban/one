@@ -36,6 +36,12 @@ func AddContextCMD(cfg *internal.Config, args []string) error {
 	privateKey := internal.StringFlag(&args, "--private-key", "--key", "--pkey", "--privateKey")
 	swarmMode := internal.BoolFlag(&args, "--swarm-mode", "--swarm")
 
+	buildFile := internal.StringFlag(&args, "--build-file", "--file", "-f")
+	buildPush := internal.BoolFlag(&args, "--build-push", "--push", "-p")
+	buildPlatform := internal.StringFlag(&args, "--build-platform", "--platform")
+	buildArgs := internal.StringFlag(&args, "--build-args", "--args")
+	buildForceRecreate := internal.BoolFlag(&args, "--build-force-recreate", "--force", "-f")
+
 	if name == "" {
 		return fmt.Errorf("name is required")
 	}
@@ -68,6 +74,16 @@ func AddContextCMD(cfg *internal.Config, args []string) error {
 			PrivateKey: privateKey,
 			SwarmMode:  swarmMode,
 		},
+	}
+
+	if buildFile != "" || buildPush || buildPlatform != "" || buildArgs != "" || buildForceRecreate {
+		context.Build = &internal.Build{
+			File:          buildFile,
+			Push:          buildPush,
+			Platform:      buildPlatform,
+			Args:          buildArgs,
+			ForceRecreate: buildForceRecreate,
+		}
 	}
 
 	if err := context.Save(); err != nil {

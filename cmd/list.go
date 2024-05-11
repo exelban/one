@@ -25,7 +25,7 @@ func ListCMD(cfg *internal.Config, args []string) error {
 	defer cancel()
 	_ = wait()
 
-	bytes := make([]byte, 1024)
+	bytes := make([]byte, 4*1024)
 	n, _ := errPipe.Read(bytes)
 	if n != 0 {
 		return fmt.Errorf("%s", string(bytes[:n]))
