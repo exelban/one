@@ -1,14 +1,21 @@
 package internal
 
-import "strings"
+import (
+	"strings"
+)
 
 func StringFlag(args *[]string, flags ...string) string {
 	for i, arg := range *args {
 		for _, f := range flags {
-			f = f + "="
-			if strings.HasPrefix(arg, f) {
+			if strings.HasPrefix(arg, f+"=") {
 				*args = remove(*args, i)
-				return strings.TrimPrefix(arg, f)
+				return strings.TrimPrefix(arg, f+"=")
+			}
+			if strings.HasPrefix(arg, f) && len(*args) > i+1 {
+				value := (*args)[i+1]
+				*args = remove(*args, i)
+				*args = remove(*args, i)
+				return value
 			}
 		}
 	}

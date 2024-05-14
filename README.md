@@ -7,6 +7,13 @@ One ctl to rule them all
 It's a personal project that helps to manage a lot of microservices in different environments and with different configurations. The project is in the early development stage.
 The main purpose of the project is to simplify the management of microservices like building the docker image, showing service logs, run/stop/restart the service, etc.
 
+## Features
+* build the docker container with predefined params
+* easy install/uninstall service
+* update the service with zero-downtime
+* specifying the context per app/project
+* easy logs and better list
+
 ## Installation
 ### Binary release
 You can manually download a binary release [here](https://github.com/exelban/one/releases).
@@ -40,10 +47,10 @@ Parameters:
 
 - `name` - the name of the service
 - `context` - the name or id of the context
-- `docker` - the docker container configuration
+- `build` - the build configuration
 - `ssh` - the ssh configuration
 
-### docker
+### build
 - `file` - the path to the Dockerfile
 - `image` - the docker image name
 - `push` - push the docker image to the registry after the build

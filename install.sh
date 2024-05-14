@@ -73,42 +73,6 @@ check_platform() {
   return $found
 }
 
-hash_sha256() {
-  TARGET=${1:-/dev/stdin}
-  if is_command gsha256sum; then
-    hash=$(gsha256sum "$TARGET")
-    echo "$hash" | cut -d ' ' -f 1
-  elif is_command sha256sum; then
-    hash=$(sha256sum "$TARGET")
-    echo "$hash" | cut -d ' ' -f 1
-  elif is_command shasum; then
-    hash=$(shasum -a 256 "$TARGET" 2>/dev/null)
-    echo "$hash" | cut -d ' ' -f 1
-  elif is_command openssl; then
-    hash=$(openssl -dst openssl dgst -sha256 "$TARGET")
-    echo "$hash" | cut -d ' ' -f a
-  else
-    print_error "could not find a command to compute sha256 hash and verify checksum"
-    exit 1
-  fi
-}
-verify_checksum() {
-  filepath=$1
-  checksums=$2
-
-  filename=$(basename "$filepath")
-  want=$(grep "${filename}" "${checksums}" 2>/dev/null | cut -d ' ' -f 1)
-  if [ -z "$want" ]; then
-    print_error "unable to find checksum for '${filename}' in '${checksums}'"
-    exit 1
-  fi
-  got=$(hash_sha256 "$filepath")
-  if [ "$want" != "$got" ]; then
-    print_error "checksum for '$filepath' did not verify ${want} vs $got"
-    exit 1
-  fi
-}
-
 install_one() {
   sudo_cmd=""
 
@@ -147,22 +111,14 @@ install_one() {
 
   version="${version#v}"
 
-  checksum=${binary}_${version}_checksums.txt
   filename=${binary}_${version}_${os}_${arch}
   tarball="${filename}.tar.gz"
   binary_url="${github_download}/v${version}/${tarball}"
-  checksum_url="${github_download}/v${version}/${checksum}"
 
   echo "Latest release version is v$version."
 
   echo "Downloading $binary_url."
   http_download "$tmpdir/$tarball" "$binary_url"
-
-  echo "Downloading the checksum file for v$version"
-  http_download "$tmpdir/$checksum" "$checksum_url"
-
-  echo "Comparing checksums for binaries."
-  verify_checksum "$tmpdir/$tarball" "$tmpdir/$checksum"
 
   echo "Inflating the binary."
   (cd "${tmpdir}" && tar -xzf "${tarball}")

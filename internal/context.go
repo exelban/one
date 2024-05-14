@@ -20,14 +20,14 @@ func (c *Context) Save() error {
 	if err != nil {
 		return fmt.Errorf("error marshall configuration: %w", err)
 	}
-	path := fmt.Sprintf("%s/%s.json", supportFolder(), c.ID)
+	path := fmt.Sprintf("%s/%s.yaml", supportFolder(), c.ID)
 	if err := os.WriteFile(path, b, 0644); err != nil {
 		return fmt.Errorf("error write configuration file: %w", err)
 	}
 	return nil
 }
 func (c *Context) Delete() error {
-	return os.Remove(fmt.Sprintf("%s/%s.json", supportFolder(), c.ID))
+	return os.Remove(fmt.Sprintf("%s/%s.yaml", supportFolder(), c.ID))
 }
 
 func AllContexts() ([]*Context, error) {
@@ -45,7 +45,7 @@ func AllContexts() ([]*Context, error) {
 
 	contexts := []*Context{}
 	for _, file := range files {
-		if file.IsDir() || file.Name() == ".DS_Store" || !strings.Contains(file.Name(), ".json") {
+		if file.IsDir() || file.Name() == ".DS_Store" || !strings.Contains(file.Name(), ".yaml") {
 			continue
 		}
 

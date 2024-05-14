@@ -61,10 +61,10 @@ func BuildCMD(cfg *internal.Config, args []string) error {
 }
 
 func buildDockerBuild(image string, c *internal.Build) (arr []string) {
-	if c.Platform != "" {
+	if c.Platforms != "" {
 		arr = append(arr, "buildx")
 		arr = append(arr, "build")
-		arr = append(arr, fmt.Sprintf("--platform=%s", c.Platform))
+		arr = append(arr, fmt.Sprintf("--platform=%s", c.Platforms))
 	} else {
 		arr = append(arr, "build")
 	}

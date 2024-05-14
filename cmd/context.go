@@ -38,7 +38,7 @@ func AddContextCMD(cfg *internal.Config, args []string) error {
 
 	buildFile := internal.StringFlag(&args, "--build-file", "--file", "-f")
 	buildPush := internal.BoolFlag(&args, "--build-push", "--push", "-p")
-	buildPlatform := internal.StringFlag(&args, "--build-platform", "--platform")
+	buildPlatform := internal.StringFlag(&args, "--build-platforms", "--platforms")
 	buildArgs := internal.StringFlag(&args, "--build-args", "--args")
 	buildForceRecreate := internal.BoolFlag(&args, "--build-force-recreate", "--force", "-f")
 
@@ -80,7 +80,7 @@ func AddContextCMD(cfg *internal.Config, args []string) error {
 		context.Build = &internal.Build{
 			File:          buildFile,
 			Push:          buildPush,
-			Platform:      buildPlatform,
+			Platforms:     buildPlatform,
 			Args:          buildArgs,
 			ForceRecreate: buildForceRecreate,
 		}
@@ -115,7 +115,6 @@ func ContextListCMD(cfg *internal.Config, args []string) error {
 		return err
 	}
 	b = b[:len(b)-1]
-	fmt.Println(string(b))
 
 	return nil
 }

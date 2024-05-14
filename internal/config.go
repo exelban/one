@@ -10,7 +10,7 @@ import (
 type Build struct {
 	File          string `yaml:"file,omitempty"`
 	Push          bool   `yaml:"push,omitempty"`
-	Platform      string `yaml:"platform,omitempty"`
+	Platforms     string `yaml:"platforms,omitempty"`
 	Args          string `yaml:"args,omitempty"`
 	ForceRecreate bool   `yaml:"force,omitempty"`
 }
@@ -77,8 +77,8 @@ func (c *Config) Print() string {
 		if c.Build.Push {
 			str += fmt.Sprintf("  Push: %t\n", c.Build.Push)
 		}
-		if c.Build.Platform != "" {
-			str += fmt.Sprintf("  Platforms: %s\n", c.Build.Platform)
+		if c.Build.Platforms != "" {
+			str += fmt.Sprintf("  Platforms: %s\n", c.Build.Platforms)
 		}
 		if c.Build.Args != "" {
 			str += fmt.Sprintf("  Args: %s\n", c.Build.Args)

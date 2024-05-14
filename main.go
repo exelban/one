@@ -103,6 +103,10 @@ func (s *cli) run(args []string) error {
 		fmt.Println(version)
 		return nil
 	}
+	ctx := internal.StringFlag(&args, "--ctx", "--context", "-c")
+	if ctx != "" {
+		s.config.Context = ctx
+	}
 
 	if s.config.SSH == nil {
 		if s.config.Context != "" {
