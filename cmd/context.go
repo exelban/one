@@ -34,7 +34,6 @@ func AddContextCMD(cfg *internal.Config, args []string) error {
 	username := internal.StringFlag(&args, "--username", "--user", "-u")
 	password := internal.StringFlag(&args, "--password", "--pass", "-p")
 	privateKey := internal.StringFlag(&args, "--private-key", "--key", "--pkey", "--privateKey")
-	swarmMode := internal.BoolFlag(&args, "--swarm-mode", "--swarm")
 
 	buildFile := internal.StringFlag(&args, "--build-file", "--file", "-f")
 	buildPush := internal.BoolFlag(&args, "--build-push", "--push", "-p")
@@ -72,7 +71,6 @@ func AddContextCMD(cfg *internal.Config, args []string) error {
 			Username:   username,
 			Password:   password,
 			PrivateKey: privateKey,
-			SwarmMode:  swarmMode,
 		},
 	}
 
@@ -115,6 +113,7 @@ func ContextListCMD(cfg *internal.Config, args []string) error {
 		return err
 	}
 	b = b[:len(b)-1]
+	fmt.Println(string(b))
 
 	return nil
 }

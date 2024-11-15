@@ -8,11 +8,12 @@ import (
 )
 
 type Build struct {
-	File          string `yaml:"file,omitempty"`
-	Push          bool   `yaml:"push,omitempty"`
-	Platforms     string `yaml:"platforms,omitempty"`
-	Args          string `yaml:"args,omitempty"`
-	ForceRecreate bool   `yaml:"force,omitempty"`
+	File          string   `yaml:"file,omitempty"`
+	Push          bool     `yaml:"push,omitempty"`
+	Platforms     string   `yaml:"platforms,omitempty"`
+	Args          string   `yaml:"args,omitempty"`
+	ForceRecreate bool     `yaml:"force,omitempty"`
+	Context       []string `yaml:"context,omitempty"`
 }
 
 type SSH struct {
@@ -22,8 +23,6 @@ type SSH struct {
 	Password   string `yaml:"password,omitempty"`
 	PrivateKey string `yaml:"privateKey,omitempty"`
 	Passphrase string `yaml:"-"`
-
-	SwarmMode bool `yaml:"swarmMode,omitempty"`
 }
 
 type Config struct {

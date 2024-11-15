@@ -61,8 +61,11 @@ func BuildCMD(cfg *internal.Config, args []string) error {
 }
 
 func buildDockerBuild(image string, c *internal.Build) (arr []string) {
-	if c.Platforms != "" {
+	if c.Platforms != "" || len(c.Context) > 0 {
 		arr = append(arr, "buildx")
+	}
+
+	if c.Platforms != "" {
 		arr = append(arr, "build")
 		arr = append(arr, fmt.Sprintf("--platform=%s", c.Platforms))
 	} else {
@@ -87,15 +90,18 @@ func buildDockerBuild(image string, c *internal.Build) (arr []string) {
 			arr = append(arr, fmt.Sprintf("--build-arg=%s", strings.Join(keyValue, "=")))
 		}
 	}
+	for _, ctx := range c.Context {
+		arr = append(arr, fmt.Sprintf("--build-context=%s", ctx))
+	}
+
+	if image != "" {
+		arr = append(arr, fmt.Sprintf("--tag=%s", image))
+	}
 
 	if c.File != "" {
 		arr = append(arr, c.File)
 	} else {
 		arr = append(arr, ".")
-	}
-
-	if image != "" {
-		arr = append(arr, fmt.Sprintf("--tag=%s", image))
 	}
 
 	return

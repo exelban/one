@@ -32,16 +32,16 @@ go install github.com/exelban/one@latest
 There are a few commands that are available in the app:
 
 - `one build` / `one b` - build the docker image.
-- `one start` / `one install` - start the service. Use `-c` to copy docker-compose to the remote server.
-- `one stop` / `one uninstall` - stop the service. Use `-c` to copy docker-compose to the remote server.
-- `one restart` / `one r` - restart the service. Use `-c` to copy docker-compose to the remote server.
+- `one start` / `one install` - start the service. Use `-c` to copy docker compose to the remote server.
+- `one stop` / `one uninstall` - stop the service. Use `-c` to copy docker compose to the remote server.
+- `one restart` / `one r` - restart the service. Use `-c` to copy docker compose to the remote server.
 - `one logs` / `one l` - show the logs of the service. Use `-f` to follow the logs.
 - `one list` - list all available services.
 - `one context` - managing the app context.
 
 ## Configuration
 Project configuration is stored in the `.one` file. It contains the information about the project and environment.  
-If the name or image is not provided in the configuration cli will try to detect the docker-compose file. If the file is found the name or image will be used from the docker-compose file.
+If the name or image is not provided in the configuration cli will try to detect the docker compose file. If the file is found the name or image will be used from the docker compose file.
 
 Parameters:
 
@@ -64,7 +64,6 @@ Parameters:
 - `username` - the username of the remote server
 - `password` - the password of the remote server
 - `privateKey` - the path to the private key
-- `swarmMode` - the docker swarm mode
 
 #### Config with context:
 ```yaml
@@ -106,7 +105,6 @@ Parameters for the context:
 - `username` - the username of the remote server
 - `password` - the password of the remote server
 - `private-key` - the path to the private key
-- `swarm` - the docker swarm mode
 
 #### Example creating the context
 ```bash

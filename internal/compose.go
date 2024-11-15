@@ -16,7 +16,7 @@ func DockerCompose(cfg *Config) *Config {
 
 	fileName := ""
 	for _, file := range files {
-		if strings.HasPrefix(file.Name(), "docker-compose") {
+		if strings.HasPrefix(file.Name(), "docker compose") {
 			fileName = file.Name()
 			break
 		}
@@ -71,7 +71,7 @@ func CopyDockerCompose(cfg *Config) error {
 
 	fileName := ""
 	for _, file := range files {
-		if strings.HasPrefix(file.Name(), "docker-compose") {
+		if strings.HasPrefix(file.Name(), "docker compose") {
 			fileName = file.Name()
 			break
 		}

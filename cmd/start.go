@@ -11,11 +11,11 @@ func StartCMD(cfg *internal.Config, args []string) error {
 	copyFile := internal.BoolFlag(&args, "--copy", "-c")
 	if copyFile {
 		if err := internal.CopyDockerCompose(cfg); err != nil {
-			return fmt.Errorf("failed to copy docker-compose file: %w", err)
+			return fmt.Errorf("failed to copy docker compose file: %w", err)
 		}
 	}
 
-	cmdName := "docker-compose"
+	cmdName := "docker compose"
 	cmdArgs := []string{"up", "--build", "-d"}
 
 	name := cfg.Name

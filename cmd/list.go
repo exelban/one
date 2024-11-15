@@ -14,9 +14,6 @@ import (
 func ListCMD(cfg *internal.Config, args []string) error {
 	cmdName := "docker"
 	cmdArgs := []string{"ps", "--format='{{json .}}'"}
-	if cfg.SSH != nil && cfg.SSH.SwarmMode {
-		cmdArgs = []string{"service", "ls", "--format='{{json .}}'"}
-	}
 
 	outPipe, errPipe, cancel, wait, err := internal.Execute(cfg, cmdName, cmdArgs)
 	if err != nil {
