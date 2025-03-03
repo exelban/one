@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/exelban/one/internal"
 	"io"
@@ -9,6 +10,8 @@ import (
 )
 
 func RestartCMD(cfg *internal.Config, args []string) error {
+	prompt()
+
 	name := cfg.Name
 	if len(args) > 0 {
 		name = args[0]
@@ -133,4 +136,16 @@ func RestartCMD(cfg *internal.Config, args []string) error {
 	fmt.Println("Graceful restart completed")
 
 	return nil
+}
+
+func prompt() {
+	fmt.Printf("-> Press any key to continue")
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		break
+	}
+	if err := scanner.Err(); err != nil {
+		panic(err)
+	}
+	fmt.Println()
 }

@@ -2,7 +2,7 @@
 
 set -eu
 
-version="0.0.2"
+version="0.0.3"
 
 build_darwin() {
   GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=$version" -o bin/one && tar -czf release/one_"$version"_darwin_x86_64.tar.gz -C bin one && rm bin/one

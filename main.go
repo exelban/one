@@ -14,8 +14,10 @@ type cli struct {
 	context *internal.Context
 }
 
+var version = "unknown"
+
 func main() {
-	cli := &cli{
+	app := &cli{
 		config:  internal.LoadConfig(),
 		context: internal.ActiveContext(),
 		commands: []internal.Command{
@@ -85,13 +87,11 @@ func main() {
 		},
 	}
 
-	if err := cli.run(os.Args[1:]); err != nil {
+	if err := app.run(os.Args[1:]); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 }
-
-var version = "unknown"
 
 func (s *cli) run(args []string) error {
 	if len(args) == 0 {
